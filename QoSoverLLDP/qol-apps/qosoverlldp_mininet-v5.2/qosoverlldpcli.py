@@ -17,7 +17,7 @@ class QoSoverLLDPCLI(CLI):
         'usage: DEV SELECTION [VALUE]\n'+\
         'where  SELECTION := { help }\n'+\
         '       DEV := s?-DEV? eg:s1-DEV1\n'+\
-        '       VLAUE := [ ?bit | ?Kbit | ?Mbit | ?Gbit | ?us | ?ms | ?s | ?% ]\n'+\
+        '       VLAUE := [ ?bit | ?Kbit | ?Mbit | ?Gbit ]\n'+\
         'e.g:   tcadd help'+\
         '       tcadd s1-eth3 10Mbit 12000  1000 0.01'
         '       四个值分别是带宽、时延、抖动、丢包率'

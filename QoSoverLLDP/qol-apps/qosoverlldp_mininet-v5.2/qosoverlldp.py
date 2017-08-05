@@ -4,7 +4,7 @@ Created on Sat Feb 25 14:31:06 2017
 
 @author: wjl
 """
-import os,time,sys,random
+import os,time,sys,random,logging
 from xml.etree import ElementTree
 import numpy as np
 from scipy import stats
@@ -92,86 +92,88 @@ class QoSoverLLDP( object ):
             if pattern_dict[p]["status"] in "false":
                 pattern_dict.pop(p)
         #如果没有一个数据生效则自动生成数据
-        if len(pattern_dict) is 0:
-            pattern_dict.setdefault("even",{"bandwidth":"100Mbit","delay":"900us","jitter":"100us","loss":"0.001%"})
+#        if len(pattern_dict) is 0:
+#            pattern_dict.setdefault("even",{"bandwidth":"100Mbit","delay":"900us","jitter":"100us","loss":"0.001%"})
         #格式化数据
-        pattern_key,pattern_value = pattern_dict.items()[0]
-        for k in pattern_value.keys():
-            if "Gbit" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("Gbit")])*1000
-            elif "Mbit" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("Mbit")])
-            elif "Kbit" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("Kbit")])/1000
-            elif "bit" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("bit")])/1000000
-            elif "us" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("us")])
-            elif "ms" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("ms")])*1000
-            elif "s" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("s")])*1000000
-            elif "%" in pattern_value[k]:
-                v = pattern_value[k]
-                pattern_value[k] = float(v[:len(v)-len("%")])
-            elif pattern_value[k].isdigit():
-                v = pattern_value[k]
-                pattern_value[k] = float(v)
-        #读取配置文件结束
-        if pattern_dict.has_key("even"):
-            for sw in self.network.switches:
-                for port in sw.ports:
-                    if port.name is not "lo":
-                        info(port.name)
-                        port.config(bw=pattern_dict["even"]["bandwidth"],delay=pattern_dict["even"]["delay"],
-                                    jitter=pattern_dict["even"]["jitter"],loss=pattern_dict["even"]["loss"])
-                        info('\n')
-        elif pattern_dict.has_key("random"):
-            for sw in self.network.switches:
-                for port in sw.ports:
-                    if port.name is not "lo":
-                        info(port.name)
-                        port.config(bw=random.randint(pattern_dict["random"]["min-bandwidth"], pattern_dict["random"]["max-bandwidth"]),
-                                    delay=random.randint(pattern_dict["random"]["min-delay"], pattern_dict["random"]["max-delay"]),
-                                    jitter=random.randint(pattern_dict["random"]["min-jitter"], pattern_dict["random"]["max-jitter"]),
-                                    loss=random.randint(pattern_dict["random"]["min-loss"], pattern_dict["random"]["max-loss"]))
-                        info('\n')
-        elif pattern_dict.has_key("normal"):
-            portlist=list()
-            for sw in self.network.switches:
-                for port in sw.ports:
-                    if port.name is not "lo":
-                        portlist.append(port)
-            mu = len(portlist)/2#均值
-            sigma = 2#标准差
-            x = np.arange(0,len(portlist)+4,1)
-            y = list(stats.norm.pdf(x,mu,sigma))
-            del y[0:2]
-            del y[len(y)-2:len(y)]
-            total=0
-            for i in y:
-                total+=i
-            for i in range(len(y)):
-                y[i]/=total
-            bandwidthMax=pattern_dict["normal"]["max-bandwidth"]#单位Mbit
-            delayMax=pattern_dict["normal"]["max-delay"]#单位us
-            jitterMax=pattern_dict["normal"]["max-jitter"]#单位us
-            lossMax=pattern_dict["normal"]["max-loss"]#单位%
-            for i in range(len(portlist)):
-                info(portlist[i].name)
-                portlist[i].config(bw=(lambda x:1 if x<1 else x)(bandwidthMax*y[i]),
-                    delay=(lambda x:1 if x<1 else x)(delayMax*y[i]),
-                    jitter=(lambda x:1 if x<1 else x)(jitterMax*y[i]),
-                    loss=(lambda x:0.0001 if x<0.0001 else x)(lossMax*y[i]))
-                info("\n")
-            
+        print pattern_dict
+        if len(pattern_dict) > 0:
+            pattern_key,pattern_value = pattern_dict.items()[0]
+            for k in pattern_value.keys():
+                if "Gbit" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("Gbit")])*1000
+                elif "Mbit" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("Mbit")])
+                elif "Kbit" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("Kbit")])/1000
+                elif "bit" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("bit")])/1000000
+                elif "us" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("us")])
+                elif "ms" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("ms")])*1000
+                elif "s" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("s")])*1000000
+                elif "%" in pattern_value[k]:
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v[:len(v)-len("%")])
+                elif pattern_value[k].isdigit():
+                    v = pattern_value[k]
+                    pattern_value[k] = float(v)
+            #读取配置文件结束
+            if pattern_dict.has_key("even"):
+                for sw in self.network.switches:
+                    for port in sw.ports:
+                        if port.name is not "lo":
+                            info(port.name)
+                            port.config(bw=pattern_dict["even"]["bandwidth"],delay=pattern_dict["even"]["delay"],
+                                        jitter=pattern_dict["even"]["jitter"],loss=pattern_dict["even"]["loss"])
+                            info('\n')
+            elif pattern_dict.has_key("random"):
+                for sw in self.network.switches:
+                    for port in sw.ports:
+                        if port.name is not "lo":
+                            info(port.name)
+                            port.config(bw=random.randint(pattern_dict["random"]["min-bandwidth"], pattern_dict["random"]["max-bandwidth"]),
+                                        delay=random.randint(pattern_dict["random"]["min-delay"], pattern_dict["random"]["max-delay"]),
+                                        jitter=random.randint(pattern_dict["random"]["min-jitter"], pattern_dict["random"]["max-jitter"]),
+                                        loss=random.randint(pattern_dict["random"]["min-loss"], pattern_dict["random"]["max-loss"]))
+                            info('\n')
+            elif pattern_dict.has_key("normal"):
+                portlist=list()
+                for sw in self.network.switches:
+                    for port in sw.ports:
+                        if port.name is not "lo":
+                            portlist.append(port)
+                mu = len(portlist)/2#均值
+                sigma = 2#标准差
+                x = np.arange(0,len(portlist)+4,1)
+                y = list(stats.norm.pdf(x,mu,sigma))
+                del y[0:2]
+                del y[len(y)-2:len(y)]
+                total=0
+                for i in y:
+                    total+=i
+                for i in range(len(y)):
+                    y[i]/=total
+                bandwidthMax=pattern_dict["normal"]["max-bandwidth"]#单位Mbit
+                delayMax=pattern_dict["normal"]["max-delay"]#单位us
+                jitterMax=pattern_dict["normal"]["max-jitter"]#单位us
+                lossMax=pattern_dict["normal"]["max-loss"]#单位%
+                for i in range(len(portlist)):
+                    info(portlist[i].name)
+                    portlist[i].config(bw=(lambda x:1 if x<1 else x)(bandwidthMax*y[i]),
+                        delay=(lambda x:1 if x<1 else x)(delayMax*y[i]),
+                        jitter=(lambda x:1 if x<1 else x)(jitterMax*y[i]),
+                        loss=(lambda x:0.0001 if x<0.0001 else x)(lossMax*y[i]))
+                    info("\n")
+           
         cwddir = os.getcwd()#当前路径
         homedir = '/'+cwddir.split('/')[1]+'/'+cwddir.split('/')[2]
         os.chdir(homedir)#为了方便切换到home目录
@@ -339,4 +341,5 @@ if __name__ == '__main__':
     except Exception,e:
         StopFloodLight()
         os.system('sudo mn -c')
+        logging.exception("exception")
         print e

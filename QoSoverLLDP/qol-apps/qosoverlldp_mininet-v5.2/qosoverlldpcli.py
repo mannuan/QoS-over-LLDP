@@ -46,7 +46,7 @@ class QoSoverLLDPCLI(CLI):
         'usage: DEV SELECTION [VALUE]\n'+\
         'where  SELECTION := { bandwidth | delay | jitter | loss | help }\n'+\
         '       DEV := s?-DEV? eg:s1-DEV1\n'+\
-        '       VLAUE := [ ?bit | ?Kbit | ?Mbit | ?Gbit | ?us | ?ms | ?s | ?% ]\n'+\
+        '       VLAUE := [ ?bit | ?Kbit | ?Mbit | ?Gbit ]\n'+\
         'e.g:   tchange s1-eth3 bandwidth 12Mbit'+\
         '       tchange s1-eth3 delay 12000'+\
         '       tchange s1-eth3 jitter 12000'+\

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selection>
+	<!-- 服务质量的初始化 -->
+	<qos-init>
+		<!-- 下面的status只能一个为true,否则无法创建网络 -->
+		<even><!-- 均匀分布 -->
+			<status>true</status>
+			<bandwidth>100Mbit</bandwidth><!-- 设置的带宽值 -->
+			<delay>900us</delay><!-- 设置的时延值 -->
+			<jitter>100us</jitter><!-- 设置的抖动值 -->
+			<loss>0.001%</loss><!-- 设置的丢包率值 -->
+		</even>
+		<random><!-- 随机服务质量 -->
+			<status>false</status>
+			<!-- 这个标签下面的每个值都必须是整数 -->
+			<max-bandwidth>1Gbit</max-bandwidth><!-- 最大带宽 -->
+			<min-bandwidth>1Mbit</min-bandwidth><!-- 最小带宽 -->
+			<max-delay>1s</max-delay><!-- 最大时延 -->
+			<min-delay>1us</min-delay><!-- 最小时延 -->
+			<max-jitter>1s</max-jitter><!-- 最大抖动 -->
+			<min-jitter>1us</min-jitter><!-- 最小抖动 -->
+			<max-loss>10%</max-loss><!-- 最大丢包率 -->
+			<min-loss>1%</min-loss><!-- 最小丢包率 -->
+		</random>
+		<normal><!-- 正态分布 -->
+			<status>false</status>
+			<max-bandwidth>1Gbit</max-bandwidth><!-- 带宽的上限 -->
+			<max-delay>1s</max-delay><!-- 时延的上限 -->
+			<max-jitter>1s</max-jitter><!-- 抖动的上限 -->
+			<max-loss>10%</max-loss><!-- 丢包率的上限 -->
+		</normal>
+	</qos-init>
+</selection>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>QoS over LLDP - HistoryQoS</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link href="../css/timeline.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="../bower_components/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<div id="wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="ui/qosoverlldp/qosoverlldp_historyqos.html">QoS over LLDP GUI v5.2</a>
+        </div>
+        <!-- /.navbar-header -->
+
+        <ul class="nav navbar-top-links navbar-right">
+        </ul>
+        <!-- /.navbar-top-links -->
+
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li>
+                        <a href="qosoverlldp_historyqos.html"><i class="fa fa-bar-chart-o fa-fw"></i> 历史服务质量</a>
+                    </li>
+                    <li>
+                        <a href="qosoverlldp_deviceqos.html"><i class="fa fa-table fa-fw"></i> 设备服务质量</a>
+                    </li>
+                    <li>
+                        <a href="qosoverlldp_shortestroute.html"><i class="fa fa-expand fa-fw"></i> 最短路径查询</a>
+                    </li>
+                    <li>
+                        <a href="qosoverlldp_topology.html"><i class="fa fa-sitemap fa-fw"></i> 网络拓扑结构</a>
+                    </li>
+                    <li>
+                        <a href="qosoverlldp_staticentrypusher.html"><i class="fa fa-sign-out"></i> 静态流表推送</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.sidebar-collapse -->
+        </div>
+        <!-- /.navbar-static-side -->
+    </nav>
+    <style>
+        #switchid_select{
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+            border: solid 1px #000;
+
+            /*很关键：将默认的select选择框样式清除*/
+            appearance:none;
+            -moz-appearance:none;
+            -webkit-appearance:none;
+
+            /*在选择框的最右侧中间显示小箭头图片*/
+            /*background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center transparent;*/
+            background-color: #ffffff;
+
+
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/
+            padding-right: 14px;
+        }
+        #portid_select{
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+            border: solid 1px #000;
+
+            /*很关键：将默认的select选择框样式清除*/
+            appearance:none;
+            -moz-appearance:none;
+            -webkit-appearance:none;
+
+            /*在选择框的最右侧中间显示小箭头图片*/
+            /*background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center transparent;*/
+            background-color: #ffffff;
+
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/
+            padding-right: 14px;
+        }
+    </style>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">历史服务质量数据分析统计</h1>
+                <div>
+                    <h4 class="page-header">请选择端口：s
+                        <select id="switchid_select" onchange="switchidSelect()">
+                        </select>-eth
+                        <select id="portid_select" onchange="portidSelect()">
+                        </select></h4>
+                </div>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" id="historyqosvariety_line">
+                        历史服务质量变化——曲线图
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-line-chart"></div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-12 -->
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading" id="historyqosvariety_pie">
+                        历史服务质量变化剧烈程度对比——饼状图
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-pie-chart"></div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-6 -->
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading" id="historyqosvariety_table" >
+                        历史服务质量数据——表格
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-line-chart-table">
+                                <table id="historyqoslist_table"  class="gridtable" style="width:100%;height:400px;">
+                                    <tbody><td>bandwidth</td><td>delay</td><td>jitter</td>
+                                    <td>loss</td><td>latency</td>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!--/.panel -->
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+<!-- jQuery -->
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+<!-- Flot Charts JavaScript -->
+<script src="../bower_components/flot/excanvas.min.js"></script>
+<script src="../bower_components/flot/jquery.flot.js"></script>
+<script src="../bower_components/flot/jquery.flot.pie.js"></script>
+<script src="../bower_components/flot/jquery.flot.resize.js"></script>
+<script src="../bower_components/flot/jquery.flot.time.js"></script>
+<script src="../bower_components/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+<script src="../js/qosoverlldp-historyqos-data.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="../dist/js/sb-admin-2.js"></script>
+<style>
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size:10px;
+        color: 	#000000;
+        margin-top: 1px;
+        border: 2px solid  	#808080;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+
+    }
+    table.gridtable th {
+        padding: 2px;
+        border-color:  	#000000;
+        text-align: center;
+        color: 	 	#000000;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 2px;
+        border-style: solid;
+        border-color:  	#000000;
+        color: 	 	#000000;
+
+    }
+
+</style>
+<script>
+    var switchidportidlistmap;
+    function refresh_switchidportidlistmap(){
+        $.ajax({
+            url:"/wm/qosoverlldp/webgui/getswitchidportidlistmap/json",
+            datatype:"json",
+            async:false,
+            success:function(data){
+                switchidportidlistmap=data;
+            }
+        });
+    }
+    refresh_switchidportidlistmap();
+    var switchid_select=document.getElementById('switchid_select');
+    for(var i=0;i<Object.keys(switchidportidlistmap).length;i++){
+        switchid_select.options.add(new Option(Object.keys(switchidportidlistmap)[i],Object.keys(switchidportidlistmap)[i]));
+    }
+    var select_switchid = document.getElementById("switchid_select").value;
+    var select_portidlist = switchidportidlistmap[select_switchid];
+    for(var i=0;i<select_portidlist.length;i++){
+        portid_select.options.add(new Option(select_portidlist[i],select_portidlist[i]));
+    }
+    function switchidSelect(){
+        var portid_select=document.getElementById('portid_select');
+        portid_select.options.length=0;
+        var select_switchid = document.getElementById("switchid_select").value;
+        var select_portidlist = switchidportidlistmap[select_switchid];
+        for(var i=0;i<select_portidlist.length;i++){
+            portid_select.options.add(new Option(select_portidlist[i],select_portidlist[i]));
+        }
+    }
+    function portidSelect(){
+    }
+</script>
+<div class="footer">
+    <a class="footer_a" href="http://www.swunix.com" target="_blank">关于QoS over LLDP GUI</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="http://www.swunix.com" target="_blank">服务条款</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="http://www.swunix.com" target="_blank">联系我们</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="/wm/qosoverlldp/api/index.html" target="_blank">QoS over LLDP API</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="/ui/index.html" target="_blank">Floodlight GUI</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="/ui/pages/qosoverlldp_statistics.html" target="_blank">QoS over LLDP Statistics</a>&nbsp;|&nbsp;
+    <a class="footer_a" href="/wm/qosoverlldp/floodlight-api.html" target="_blank">Floodlight API</a>&nbsp;|&nbsp;
+    <span class="gray">Copyright (c) 2016 - 2017 SWUNIX Lab, swunix.com, Inc. All Rights Reserved.</span></div>
+<style>
+    .footer {
+        position: fixed;
+        _position: static;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        clear: both;
+        line-height: 36px;
+        text-align: center;
+        color: #b6b6b6;
+        background-color: #eff4fa;
+        border-top: 1px solid #d6dfea;
+        font-family: "lucida Grande", Verdana, "Microsoft YaHei";
+        font-size: 12px;
+        color: #868686;
+    }.footer_a{
+         color: #1d5494
+     }
+</style>
+</body>
+
+</html>

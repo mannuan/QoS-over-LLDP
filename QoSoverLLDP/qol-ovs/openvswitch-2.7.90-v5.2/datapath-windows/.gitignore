@@ -1,0 +1,8 @@
+/Package/x64/
+*.db
+*.opendb
+*.opensdf
+*.sdf
+/ovsext/x64/
+/x64
+/ovsext/ovsext.aps

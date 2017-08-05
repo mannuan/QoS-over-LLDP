@@ -5,7 +5,7 @@
 		<!-- 下面的status只能一个为true,否则无法创建网络 -->
 		<even><!-- 均匀分布 -->
 			<status>true</status>
-			<bandwidth>100Mbit</bandwidth><!-- 设置的带宽值 -->
+			<bandwidth>6Mbit</bandwidth><!-- 设置的带宽值 -->
 			<delay>900us</delay><!-- 设置的时延值 -->
 			<jitter>100us</jitter><!-- 设置的抖动值 -->
 			<loss>0.001%</loss><!-- 设置的丢包率值 -->

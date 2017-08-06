@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import urllib2
 import json
 import sys,datetime
+from itertools import islice
 
 def Get_SrcSw_DstSw(src_host,dst_host,Error_list,shortest_path,begin_insert):
     #获取网络所有设备的列表
@@ -81,15 +82,21 @@ def Get_ShortestRoute(src_host,dst_host,src_sw,dst_sw,Error_list,shortest_path,b
 #    nx.draw(G,pos,with_labels=True,node_size = 1,font_size=24,font_color='red')
 #    plt.savefig("Graph.png")
     try:
-        #生成最优路径
+        #生成最短路径
         t1=datetime.datetime.now().microsecond
         shortest_sw_path = nx.dijkstra_path(G,src_sw,dst_sw)
         t2=datetime.datetime.now().microsecond
         dijkstra_path_time=str(t2-t1)+"ms"
         t3=datetime.datetime.now().microsecond
-        shortest_sw_path = nx.all_pairs_shortest_path(G)[src_sw][dst_sw]
+        nx.all_pairs_shortest_path(G)[src_sw][dst_sw]
         t4=datetime.datetime.now().microsecond
         all_shortest_path_time=str(t4-t3)+"ms"
+        def k_shortest_paths(G, source, target, k, weight=None):
+            return list(islice(nx.shortest_simple_paths(G, source, target),k))
+        t5=datetime.datetime.now().microsecond
+        k_shortest_paths(G,src_sw,dst_sw,1)
+        t6=datetime.datetime.now().microsecond
+        k_shortest_paths_time=str(t6-t5)+"ms"
         if(len(shortest_sw_path)>=2):
     #        print shortest_sw_path
             for i in range(0,len(shortest_sw_path)-1):
@@ -110,6 +117,7 @@ def Get_ShortestRoute(src_host,dst_host,src_sw,dst_sw,Error_list,shortest_path,b
                     begin_insert += 1
         shortest_path.append({"dijkstra_path_time":dijkstra_path_time})
         shortest_path.append({"all_shortest_path_time":all_shortest_path_time})
+        shortest_path.append({"k_shortest_paths_time":k_shortest_paths_time})
     except Exception,e:
         print e
         Error_list = []

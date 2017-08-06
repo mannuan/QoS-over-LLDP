@@ -62,13 +62,6 @@ public class ShortestRouteResource extends ServerResource {
 		"\n" +
 		"@author: mininet\n" +
 		"\"\"\"\n" +
-		"\n" +
-		"# -*- coding: utf-8 -*-\n" +
-		"\"\"\"\n" +
-		"Created on Sat Dec 31 18:32:27 2016\n" +
-		"\n" +
-		"@author: wjl\n" +
-		"\"\"\"\n" +
 		"import networkx as nx\n" +
 		"import matplotlib.pyplot as plt\n" +
 		"import urllib2\n" +
@@ -146,7 +139,7 @@ public class ShortestRouteResource extends ServerResource {
 		"#    nx.draw(G,pos,with_labels=True,node_size = 1,font_size=24,font_color='red')\n" +
 		"#    plt.savefig(\"Graph.png\")\n" +
 		"    try:\n" +
-		"        #生成最优路径\n" +
+		"        #生成最短路径\n" +
 		"        shortest_sw_path = nx.dijkstra_path(G,src_sw,dst_sw)\n" +
 		"        if(len(shortest_sw_path)>=2):\n" +
 		"    #        print shortest_sw_path\n" +

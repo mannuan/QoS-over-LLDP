@@ -53,12 +53,14 @@ public class QoSoverLLDPAPI {
 
     protected Class _class;//实现API的类的名称
     protected String resource;//请求资源的名称
+    protected String segment = "/";//数据格式前面分隔符
     protected String type;//呈现的数据格式
     protected String description;//API的功能
     protected String parameter1;//参数1
     protected ArrayList<String> parameter1_option;//参数1的固定选项
     protected String parameter2;//参数2
     protected String parameter3;//参数3
+    protected String parameter4;//参数4
 
     /**
      * API的初始化
@@ -66,7 +68,7 @@ public class QoSoverLLDPAPI {
      * @param resource 请求资源的名称
      * @param type 返回的数据类型
      */
-    public QoSoverLLDPAPI(Class _class,String resource,String type){
+    public QoSoverLLDPAPI(Class _class, String resource, String type){
         this._class = _class;
         this.resource = resource;
         this.type = type;
@@ -75,9 +77,15 @@ public class QoSoverLLDPAPI {
         this.parameter1_option = new ArrayList<>();
         this.parameter2 = new String();
         this.parameter3 = new String();
+        this.parameter4 = new String();
     }
 
-    public QoSoverLLDPAPI(String resource,String type){
+    /**
+     * API的初始化
+     * @param resource 请求资源的名称
+     * @param type 返回的数据类型
+     */
+    public QoSoverLLDPAPI(String resource, String type){
         this._class = null;
         this.resource = resource;
         this.type = type;
@@ -86,6 +94,46 @@ public class QoSoverLLDPAPI {
         this.parameter1_option = new ArrayList<>();
         this.parameter2 = new String();
         this.parameter3 = new String();
+        this.parameter4 = new String();
+    }
+
+    /**
+     * API的初始化
+     * @param _class java类的类名
+     * @param resource 请求资源的名称
+     * @param segment 数据格式前面分隔符
+     * @param type 返回的数据类型
+     */
+    public QoSoverLLDPAPI(Class _class, String resource, String segment, String type){
+        this._class = _class;
+        this.resource = resource;
+        this.segment = segment;
+        this.type = type;
+        this.description = new String();
+        this.parameter1 = new String();
+        this.parameter1_option = new ArrayList<>();
+        this.parameter2 = new String();
+        this.parameter3 = new String();
+        this.parameter4 = new String();
+    }
+
+    /**
+     * API的初始化
+     * @param resource 请求资源的名称
+     * @param segment 数据格式前面分隔符
+     * @param type 返回的数据类型
+     */
+    public QoSoverLLDPAPI(String resource, String segment, String type){
+        this._class = null;
+        this.resource = resource;
+        this.segment = segment;
+        this.type = type;
+        this.description = new String();
+        this.parameter1 = new String();
+        this.parameter1_option = new ArrayList<>();
+        this.parameter2 = new String();
+        this.parameter3 = new String();
+        this.parameter4 = new String();
     }
 
     /**
@@ -158,6 +206,24 @@ public class QoSoverLLDPAPI {
      *
      * @param a
      * @param b
+     * @param c
+     */
+    public void setParameter(String a,String b,String c){
+        if(!a.contains("{")) a="{"+a;
+        if(!a.contains("}")) a+="}";
+        this.parameter2 = a;
+        if(!b.contains("{")) b="{"+b;
+        if(!b.contains("}")) b+="}";
+        this.parameter3 = b;
+        if(!c.contains("{")) c="{"+c;
+        if(!c.contains("}")) c+="c";
+        this.parameter4 = c;
+    }
+
+    /**
+     *
+     * @param a
+     * @param b
      */
     public void setParameter(String a,String b){
         if(!a.contains("{")) a="{"+a;
@@ -195,6 +261,14 @@ public class QoSoverLLDPAPI {
     }
 
     /**
+     * 返回数据格式前面的分隔符
+     * @return
+     */
+    public String getSegment(){
+        return this.segment;
+    }
+
+    /**
      * 返回数据类型
      * @return
      */
@@ -220,23 +294,29 @@ public class QoSoverLLDPAPI {
     public String getParameter3(){
         return this.parameter3;
     }
+    public String getParameter4(){
+        return this.parameter4;
+    }
 
     /**
      * 返回url的后面半截
      * @return path
      */
     public String getPath(){
-        String path="/"+this.resource+"/";
+        String path="/"+this.resource;
         if(!this.parameter1.isEmpty()){
-            path+=this.parameter1+"/";
+            path+="/"+this.parameter1;
         }
         if(!this.parameter2.isEmpty()){
-            path+=this.parameter2+"/";
+            path+="/"+this.parameter2;
         }
         if(!this.parameter3.isEmpty()){
-            path+=this.parameter3+"/";
+            path+="/"+this.parameter3;
         }
-        path+=this.type;
+        if(!this.parameter4.isEmpty()){
+            path+="/"+this.parameter4;
+        }
+        path+=this.segment+this.type;
         return path;
     }
 

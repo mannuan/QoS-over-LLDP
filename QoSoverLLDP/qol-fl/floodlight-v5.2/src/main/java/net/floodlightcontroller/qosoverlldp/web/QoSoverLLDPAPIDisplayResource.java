@@ -163,7 +163,7 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
     public String indexhtml2 =
         "</select></a><a id=\"a_option1\">/<select id=\"option1_select\" onchange=\"option1Select()\">\n";
     public String indexhtml3 =
-        "</select></a><a id=\"a_option2\">/<input id=\"option2_input\"placeholder=\"option2\"></a><a id=\"a_option3\">/<input id=\"option3_input\" placeholder=\"option3\"></a>/<a id=\"type\">type</a>\n" +
+        "</select></a><a id=\"a_option2\">/<input id=\"option2_input\"placeholder=\"option2\"></a><a id=\"a_option3\">/<input id=\"option3_input\" placeholder=\"option3\"></a><a id=\"a_option4\">/<input id=\"option4_input\" placeholder=\"option4\"></a><a id=\"type\">type</a>\n" +
         "<button id=\"skip\" class=\"skip\">GO</button>\n" +
         "</header>\n" +
         "<p id=\"description\" class=\"feature\"></p>"+
@@ -178,11 +178,13 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
         "var option1=document.getElementById(\"option1_select\").value;\n" +
         "var option2=document.getElementById(\"option2_input\").value;\n" +
         "var option3=document.getElementById(\"option3_input\").value;\n" +
+        "var option4=document.getElementById(\"option4_input\").value;\n" +
         "var url=\"http://\"+ip_port+\"/wm/qosoverlldp/\"+section;\n" +
         "if(document.getElementById(\"a_option1\").style.display==\"\") url+=\"/\"+option1;\n" +
         "if(document.getElementById(\"a_option2\").style.display==\"\") url+=\"/\"+option2;\n" +
         "if(document.getElementById(\"a_option3\").style.display==\"\") url+=\"/\"+option3;\n" +
-        "url+=\"/\"+document.getElementById(\"type\").innerHTML\n" +
+        "if(document.getElementById(\"a_option4\").style.display==\"\") url+=\"/\"+option4;\n" +
+        "url+=document.getElementById(\"type\").innerHTML\n" +
         "window.open(url);\n" +
         "};\n" +
         "</script>\n";
@@ -206,15 +208,16 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
         }
         String resources = new String();
         String resource_script =
-        "<script type=\"text/javascript\">\n";
+                "<script type=\"text/javascript\">\n";
         if(!QoSoverLLDPAPIList.isEmpty()){
             resource_script +=
-            "document.getElementById(\"type\").innerHTML=\""+QoSoverLLDPAPIList.get(0).getType()+"\";"+
-                    "document.getElementById(\"section\").style.width="+QoSoverLLDPAPIList.get(0).getResource().length()*12.5+"+\"px\"\n"+
-                    "document.getElementById(\"option2_input\").style.width="+QoSoverLLDPAPIList.get(0).getParameter2().length()*12.5+"+\"px\"\n"+
-                    "document.getElementById(\"option3_input\").style.width="+QoSoverLLDPAPIList.get(0).getParameter3().length()*12.5+"+\"px\"\n"+
-                    "document.getElementById(\"option2_input\").setAttribute(\"placeholder\",\"" + QoSoverLLDPAPIList.get(0).getParameter2() + "\");\n"+
-                    "document.getElementById(\"option3_input\").setAttribute(\"placeholder\",\"" + QoSoverLLDPAPIList.get(0).getParameter3() + "\");\n";
+                    "document.getElementById(\"type\").innerHTML=\""+QoSoverLLDPAPIList.get(0).getSegment()+QoSoverLLDPAPIList.get(0).getType()+"\";"+
+                            "document.getElementById(\"section\").style.width="+QoSoverLLDPAPIList.get(0).getResource().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option2_input\").style.width="+QoSoverLLDPAPIList.get(0).getParameter2().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option3_input\").style.width="+QoSoverLLDPAPIList.get(0).getParameter3().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option2_input\").setAttribute(\"placeholder\",\"" + QoSoverLLDPAPIList.get(0).getParameter2() + "\");\n"+
+                            "document.getElementById(\"option3_input\").setAttribute(\"placeholder\",\"" + QoSoverLLDPAPIList.get(0).getParameter3() + "\");\n"+
+                            "document.getElementById(\"option4_input\").setAttribute(\"placeholder\",\"" + QoSoverLLDPAPIList.get(0).getParameter4() + "\");\n";
             for(String option1:QoSoverLLDPAPIList.get(0).getParameter1_option()){
                 resource_script+="var option1_select=document.getElementById('option1_select');\n"+
                         "option1_select.options.add(new Option(\""+option1+"\",\""+option1+"\"));\n";
@@ -236,25 +239,33 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
             }else{
                 resource_script+="document.getElementById(\"a_option3\").style.display=\"\";\n";
             }
+            if(QoSoverLLDPAPIList.get(0).getParameter4().isEmpty()){
+                resource_script+="document.getElementById(\"a_option4\").style.display=\"none\";\n";
+            }else{
+                resource_script+="document.getElementById(\"a_option4\").style.display=\"\";\n";
+            }
         }
         resource_script+=
-        "function sectionSeclect(){\n" +
-        "document.getElementById(\"option2_input\").value=\"\";\n"+
-        "document.getElementById(\"option3_input\").value=\"\";\n"+
-        "switch(document.getElementById(\"section\").value){\n";
+                "function sectionSeclect(){\n" +
+                        "document.getElementById(\"option2_input\").value=\"\";\n"+
+                        "document.getElementById(\"option3_input\").value=\"\";\n"+
+                        "document.getElementById(\"option4_input\").value=\"\";\n"+
+                        "switch(document.getElementById(\"section\").value){\n";
         Set<String> option1_set = new HashSet<String>();
         for(QoSoverLLDPAPI api:QoSoverLLDPAPIList){
             resources+="<option value=\""+api.getResource()+"\">"+api.getResource()+"</option>\n";
             option1_set.addAll(api.getParameter1_option());
             resource_script+=
                     "case \""+api.getResource()+"\":\n" +
-                    "document.getElementById(\"type\").innerHTML=\""+api.getType()+"\";"+
-                    "document.getElementById(\"section\").style.width="+api.getResource().length()*12.5+"+\"px\";\n" +
-                    "document.getElementById(\"option2_input\").style.width="+api.getParameter2().length()*12.5+"+\"px\"\n"+
-                    "document.getElementById(\"option3_input\").style.width="+api.getParameter3().length()*12.5+"+\"px\"\n"+
-                    "document.getElementById(\"option2_input\").setAttribute(\"placeholder\",\""+api.getParameter2()+"\");\n"+
-                    "document.getElementById(\"option3_input\").setAttribute(\"placeholder\",\""+api.getParameter3()+"\");\n"+
-                    "document.getElementById(\"description\").innerHTML=\"API用法：</br>"+api.getDescription()+"\";\n";
+                            "document.getElementById(\"type\").innerHTML=\""+api.getSegment()+api.getType()+"\";"+
+                            "document.getElementById(\"section\").style.width="+api.getResource().length()*12.5+"+\"px\";\n" +
+                            "document.getElementById(\"option2_input\").style.width="+api.getParameter2().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option3_input\").style.width="+api.getParameter3().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option4_input\").style.width="+api.getParameter4().length()*12.5+"+\"px\"\n"+
+                            "document.getElementById(\"option2_input\").setAttribute(\"placeholder\",\""+api.getParameter2()+"\");\n"+
+                            "document.getElementById(\"option3_input\").setAttribute(\"placeholder\",\""+api.getParameter3()+"\");\n"+
+                            "document.getElementById(\"option4_input\").setAttribute(\"placeholder\",\""+api.getParameter4()+"\");\n"+
+                            "document.getElementById(\"description\").innerHTML=\"API用法：</br>"+api.getDescription()+"\";\n";
             if(api.getParameter1().isEmpty()){
                 resource_script+="document.getElementById(\"a_option1\").style.display=\"none\";\n";
             }else{
@@ -270,18 +281,23 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
             }else{
                 resource_script+="document.getElementById(\"a_option3\").style.display=\"\";\n";
             }
+            if(api.getParameter4().isEmpty()){
+                resource_script+="document.getElementById(\"a_option4\").style.display=\"none\";\n";
+            }else{
+                resource_script+="document.getElementById(\"a_option4\").style.display=\"\";\n";
+            }
             resource_script+=
-            "var option1_select=document.getElementById('option1_select');\n"+
-            "option1_select.options.length=0;\n";
+                    "var option1_select=document.getElementById('option1_select');\n"+
+                            "option1_select.options.length=0;\n";
             for(String option1:api.getParameter1_option()){
                 resource_script+=
-                "option1_select.options.add(new Option(\""+option1+"\",\""+option1+"\"));\n";
+                        "option1_select.options.add(new Option(\""+option1+"\",\""+option1+"\"));\n";
             }
             if(!api.getParameter1_option().isEmpty()){
                 resource_script+="option1_select.style.width="+api.getParameter1_option().get(0).length()*12.5+"+\"px\"\n";
             }
             resource_script+=
-            "break;\n";
+                    "break;\n";
         }
         resource_script+="}}</script>";
         ArrayList<String> option1_list = new ArrayList<>();
@@ -291,12 +307,12 @@ public class QoSoverLLDPAPIDisplayResource extends ServerResource{
             option1_script+="document.getElementById(\"option1_select\").style.width="+option1_list.get(0).length()*12.5+"+\"px\"\n";
         }
         option1_script+="function option1Select(){\n" +
-        "switch(document.getElementById(\"option1_select\").value){\n";
+                "switch(document.getElementById(\"option1_select\").value){\n";
         for(String option1:option1_list){
             option1_script+=
                     "case \""+option1+"\":\n" +
-                    "document.getElementById(\"option1_select\").style.width="+option1.length()*12.5+"+\"px\";\n" +
-                    "break;\n";
+                            "document.getElementById(\"option1_select\").style.width="+option1.length()*12.5+"+\"px\";\n" +
+                            "break;\n";
         }
         option1_script+="}}</script>";
         indexhtml = indexhtml1+resources+indexhtml2+indexhtml3+resource_script+option1_script+indexhtml4;

@@ -68,6 +68,7 @@ public class GenerateShortestRouteTimeResource extends ServerResource {
         "import urllib2\n" +
         "import json\n" +
         "import sys,datetime\n" +
+        "from itertools import islice\n" +
         "\n" +
         "def Get_SrcSw_DstSw(src_host,dst_host,Error_list,shortest_path,begin_insert):\n" +
         "    #获取网络所有设备的列表\n" +
@@ -140,15 +141,21 @@ public class GenerateShortestRouteTimeResource extends ServerResource {
         "#    nx.draw(G,pos,with_labels=True,node_size = 1,font_size=24,font_color='red')\n" +
         "#    plt.savefig(\"Graph.png\")\n" +
         "    try:\n" +
-        "        #生成最优路径\n" +
+        "        #生成最短路径\n" +
         "        t1=datetime.datetime.now().microsecond\n" +
         "        shortest_sw_path = nx.dijkstra_path(G,src_sw,dst_sw)\n" +
         "        t2=datetime.datetime.now().microsecond\n" +
         "        dijkstra_path_time=str(t2-t1)+\"ms\"\n" +
         "        t3=datetime.datetime.now().microsecond\n" +
-        "        shortest_sw_path = nx.all_pairs_shortest_path(G)[src_sw][dst_sw]\n" +
+        "        nx.all_pairs_shortest_path(G)[src_sw][dst_sw]\n" +
         "        t4=datetime.datetime.now().microsecond\n" +
         "        all_shortest_path_time=str(t4-t3)+\"ms\"\n" +
+        "        def k_shortest_paths(G, source, target, k, weight=None):\n" +
+        "            return list(islice(nx.shortest_simple_paths(G, source, target),k))\n" +
+        "        t5=datetime.datetime.now().microsecond\n" +
+        "        k_shortest_paths(G,src_sw,dst_sw,1)\n" +
+        "        t6=datetime.datetime.now().microsecond\n" +
+        "        k_shortest_paths_time=str(t6-t5)+\"ms\"\n" +
         "        if(len(shortest_sw_path)>=2):\n" +
         "    #        print shortest_sw_path\n" +
         "            for i in range(0,len(shortest_sw_path)-1):\n" +
@@ -169,6 +176,7 @@ public class GenerateShortestRouteTimeResource extends ServerResource {
         "                    begin_insert += 1\n" +
         "        shortest_path.append({\"dijkstra_path_time\":dijkstra_path_time})\n" +
         "        shortest_path.append({\"all_shortest_path_time\":all_shortest_path_time})\n" +
+        "        shortest_path.append({\"k_shortest_paths_time\":k_shortest_paths_time})\n" +
         "    except Exception,e:\n" +
         "        print e\n" +
         "        Error_list = []\n" +

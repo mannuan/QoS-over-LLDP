@@ -88,6 +88,9 @@ def Get_ShortestRoute(src_host,dst_host,src_sw,dst_sw,Error_list,shortest_path,b
         shortest_paths = list()
         shortest_sw_paths = k_shortest_paths(G, src_sw, dst_sw,k)
         for shortest_sw_path in shortest_sw_paths:
+            shortest_path_tmp = list()
+            shortest_path_tmp.extend(shortest_path)
+            begin_insert_tmp = begin_insert
             if(len(shortest_sw_path)>=2):
                 for i in range(0,len(shortest_sw_path)-1):
                     src_sw = str(shortest_sw_path[i])
@@ -96,16 +99,16 @@ def Get_ShortestRoute(src_host,dst_host,src_sw,dst_sw,Error_list,shortest_path,b
                     src_dst_port = src_dst_sw_port.get(src_sw+dst_sw)
                     if(src_dst_port is None):
                         src_dst_port = src_dst_sw_port.get(dst_sw+src_sw)
-                        shortest_path.insert(begin_insert,'s'+src_sw+'-eth'+str(src_dst_port[1]))
-                        begin_insert += 1
-                        shortest_path.insert(begin_insert,'s'+dst_sw+'-eth'+str(src_dst_port[0]))
-                        begin_insert += 1
+                        shortest_path_tmp.insert(begin_insert_tmp,'s'+src_sw+'-eth'+str(src_dst_port[1]))
+                        begin_insert_tmp += 1
+                        shortest_path_tmp.insert(begin_insert_tmp,'s'+dst_sw+'-eth'+str(src_dst_port[0]))
+                        begin_insert_tmp += 1
                     else:
-                        shortest_path.insert(begin_insert,'s'+src_sw+'-eth'+str(src_dst_port[0]))
-                        begin_insert += 1
-                        shortest_path.insert(begin_insert,'s'+dst_sw+'-eth'+str(src_dst_port[1]))
-                        begin_insert += 1
-            shortest_paths.append(shortest_path)
+                        shortest_path_tmp.insert(begin_insert_tmp,'s'+src_sw+'-eth'+str(src_dst_port[0]))
+                        begin_insert_tmp += 1
+                        shortest_path_tmp.insert(begin_insert_tmp,'s'+dst_sw+'-eth'+str(src_dst_port[1]))
+                        begin_insert_tmp += 1
+            shortest_paths.append(shortest_path_tmp)
     except Exception,e:
         print e
         Error_list = []

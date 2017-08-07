@@ -24,6 +24,7 @@ import random
 from mininet.topo import Topo
 
 #    sw_count * link_count_per_sw must be even
+#    link_count_per_sw < sw_count
 class MeshTopo(Topo):
     def __init__(self,sw_count=3,link_count_per_sw=2,host_count=2,host_count_per_sw=1):
         Topo.__init__(self)

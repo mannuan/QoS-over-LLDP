@@ -4,7 +4,7 @@
 	<qos-init>
 		<!-- 下面的status只能一个为true,否则默认选择第一个true -->
 		<even><!-- 均匀分布 -->
-			<status>false</status>
+			<status>true</status>
 			<bandwidth>100Mbit</bandwidth><!-- 设置的带宽值 -->
 			<delay>900us</delay><!-- 设置的时延值 -->
 			<jitter>100us</jitter><!-- 设置的抖动值 -->

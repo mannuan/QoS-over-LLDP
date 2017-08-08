@@ -126,7 +126,6 @@ if __name__ == '__main__':
         os.system(qosoverlldp_cmd)
         StartFloodLight()#开启floodlight控制器
         StopFloodLight()#关闭floodlight控制器
-        os.system('reset')
         sys.exit()
     except Exception,e:
         StopFloodLight()

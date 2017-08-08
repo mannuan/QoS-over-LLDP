@@ -1,8 +1,0 @@
-class htb 5:1 root leaf 10: prio 0 rate 102Mbit ceil 102Mbit burst 15338b cburst 1581b 
-
-qdisc htb 5: root refcnt 2 r2q 10 default 1 direct_packets_stat 0 direct_qlen 1000
-qdisc netem 10: parent 5:1 limit 1000 delay 10us  11us loss 7%
-
-
-qdisc pfifo_fast 0: root refcnt 2 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
-

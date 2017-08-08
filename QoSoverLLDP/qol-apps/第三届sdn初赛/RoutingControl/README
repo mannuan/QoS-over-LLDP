@@ -1,5 +1,0 @@
-forth_topo.py是创建拓扑的文件
-myutil.py,myutil_2.py是许多方法和类的集合
-routingcontrol.py是路由控制应用程序
-verification.py是路由验证程序
-no_fwd.properties是禁用了转发模块的配置文件

@@ -116,7 +116,12 @@ if __name__ == '__main__':
         print prompt
         sys.exit(0)
     try:
-        qosoverlldp_cmd = 'gnome-terminal -e \"python qosoverlldp.py '+topotype+' floodlight\"'
+        isxterm=(lambda:True if(len(os.popen('dpkg -l | grep \'xterm\'').read())>0) else False)()
+        isgnometerminal=(lambda:True if(len(os.popen('dpkg -l | grep \'gnome-terminal\'').read())>0) else False)()
+        if(isxterm):
+            qosoverlldp_cmd = 'xterm -e \"python qosoverlldp.py '+topotype+' floodlight\" &'
+        if(isgnometerminal):
+            qosoverlldp_cmd = 'gnome-terminal -e \"python qosoverlldp.py '+topotype+' floodlight\" &'
         print qosoverlldp_cmd
         os.system(qosoverlldp_cmd)
         StartFloodLight()#开启floodlight控制器

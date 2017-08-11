@@ -128,13 +128,13 @@ class QoSoverLLDPCLI(CLI):
             
     def do_addStaticEntry(self, line):
             
-        prompt = 'usage: staticflowpusher optimal_type src dst\n'+\
-                 'e.g:   staticflowpusher bandwidth h1 h2\n'+\
-                 '       staticflowpusher delay h1 h2\n'+\
-                 '       staticflowpusher jitter h1 h2\n'+\
-                 '       staticflowpusher loss h1 h2\n'+\
-                 '       staticflowpusher latency h1 h2\n'+\
-                 '       staticflowpusher total h1 h2\n'
+        prompt = 'usage: addStaticEntry optimal_type src dst\n'+\
+                 'e.g:   addStaticEntry bandwidth h1 h2\n'+\
+                 '       addStaticEntry delay h1 h2\n'+\
+                 '       addStaticEntry jitter h1 h2\n'+\
+                 '       addStaticEntry loss h1 h2\n'+\
+                 '       addStaticEntry latency h1 h2\n'+\
+                 '       addStaticEntry total h1 h2\n'
                  
         try:
             arglist = line.split()

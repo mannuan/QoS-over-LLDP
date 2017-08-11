@@ -318,23 +318,18 @@ if __name__ == '__main__':
                         os.system('kill '+process)
                         break
                     time.sleep(1)
-                for i in range(10):
-                    sys.stdout.write('  floodlight启动中,剩余%ds                                               \r'
-                        %(9-i))
-                    sys.stdout.flush()
-                    time.sleep(1)
-                print 'floodlight控制器初始化完毕'
         #开始
         if(timer is not 0-1):
-#            f = open("timelist.txt","a")
-#            t1 = time.time()
+            os.system('reset')
+            for i in range(10):#倒计时
+                sys.stdout.write('floodlight启动中,剩余%ds\r'%(9-i))
+                sys.stdout.flush()
+                time.sleep(1)
+            print 'floodlight控制器初始化完毕'
             qol = QoSoverLLDP(topotype=topotype)
             qol.start()
             qol.cli()
             qol.stop()
-#            t2 = time.time()
-#            f.write("%f\n"%(t2-t1))
-#            f.close()
             if len(sys.argv) is 3:
                 if sys.argv[2] in 'floodlight':
                     StopFloodLight()#关闭floodlight控制器

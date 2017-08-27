@@ -250,16 +250,15 @@ add_qos_to_lldp(struct ofpbuf* packet){
      * 在执行linux shell 脚本的过程中,不断的计算qos信息,然后有不断的把它们输出到文件中,如果遇到错误那么就把生成的所有文件删除（包括qosoverlldp.sh）
      * 最后又重复上面的流程,知道虚拟交换机停止工作为止
      */
-    char* qosoverlldp_folder = xm_vsprintf_ex(strlen("/tmp/")+strlen(QOSOVERLLDP_FOLDER_NAME)+1,"/tmp/%s",QOSOVERLLDP_FOLDER_NAME);
-	if(access(qosoverlldp_folder,F_OK)!=0){//如果(存放qosoverlldp项目所有tmp文件的)目录不存在则创建
-		mkdir(qosoverlldp_folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if(access(QOSOVERLLDP_FOLDER_NAME,F_OK)!=0){//如果(存放qosoverlldp项目所有tmp文件的)目录不存在则创建
+		mkdir(QOSOVERLLDP_FOLDER_NAME, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	}
-	int folder_len = strlen(qosoverlldp_folder);
-	int shname_len = strlen(QOSOVERLLDP_SH_NAME);
 	int chassisid_len = strlen(chassisid);
 	int portid_len = strlen(portid);
-	char* qosoverlldp_shfile = xm_vsprintf_ex(folder_len+2+shname_len,"%s/%s",qosoverlldp_folder,QOSOVERLLDP_SH_NAME);
-    if(access(qosoverlldp_folder,F_OK)==0 && access(qosoverlldp_shfile,F_OK)!=0){//如果目录存在，并且qosoverlldp.sh文件不存在,创建
+	int folder_len = strlen(QOSOVERLLDP_FOLDER_NAME);
+	int shname_len = strlen(QOSOVERLLDP_SH_NAME);
+	char* qosoverlldp_shfile = xm_vsprintf_ex(folder_len+2+shname_len,"%s%s",QOSOVERLLDP_FOLDER_NAME,QOSOVERLLDP_SH_NAME);
+    if(access(QOSOVERLLDP_FOLDER_NAME,F_OK)==0 && access(qosoverlldp_shfile,F_OK)!=0){//如果目录存在，并且qosoverlldp.sh文件不存在,创建
     	FILE *fptr;
     	if((fptr = fopen(qosoverlldp_shfile,"w")) == NULL) return;
     	char* qosoverlldp_sh_content = QOSOVERLLDP_SH_CONTENT;
@@ -267,12 +266,16 @@ add_qos_to_lldp(struct ofpbuf* packet){
     	fclose(fptr);
     }
     //注意字符串的长度，是不是超了
-    char* process_format = "ps ax | grep 'sh %s/%s s%s-eth%s' | sed '/grep/d' | awk '{print $1}'";
+    char* process_format = "ps ax | grep 'sh %s%s s%s-eth%s' | sed '/grep/d' | awk '{print $1}'";
 	char* process_cmd = xm_vsprintf_ex(strlen(process_format)+folder_len+strlen(QOSOVERLLDP_SH_NAME)+chassisid_len+portid_len,process_format,
-			qosoverlldp_folder,QOSOVERLLDP_SH_NAME,chassisid,portid);//获取进程号的字符串，如果查无此进程则返回一个字符'\n',如果有进程号则字符串的长度必大于1
+			QOSOVERLLDP_FOLDER_NAME,QOSOVERLLDP_SH_NAME,chassisid,portid);//获取进程号的字符串，如果查无此进程则返回一个字符'\n',如果有进程号则字符串的长度必大于1
 	if(access(qosoverlldp_shfile,F_OK)==0 && send_cmd(process_cmd) <= 1){//如果有qosoverlldp.sh这个文件,并且没有在运行这个linux shell脚本
-		char* sh_cmd = xm_vsprintf_ex(strlen("sh %s/%s s%s-eth%s &")+folder_len+shname_len+chassisid_len+portid_len,
-				"sh %s/%s s%s-eth%s &",qosoverlldp_folder,QOSOVERLLDP_SH_NAME,chassisid,portid);//注意字符串的长度，是不是超了
+		//这里linu shell 脚本命令行参数的顺序依次是：端口的名称、采集qos的时间间隔、存放带宽信息的文件的关键字、存放时延信息的文件的关键字、存放抖动信息的文件的关键字、
+		//存放丢包率信息的文件的关键字、linux shell 脚本的文件名、存放qos信息的绝对路径
+		char* sh_cmd = xm_vsprintf_ex(strlen("sh %s%s s%s-eth%s %s %s %s %s %s %s %s &")+folder_len+shname_len+chassisid_len+portid_len+
+				strlen(INTERVAL)+strlen(BANDWIFTH_FILE)+strlen(DELAY_FILE)+strlen(JITTER_FILE)+strlen(LOSS_FILE)+shname_len+folder_len,
+				"sh %s%s s%s-eth%s %s %s %s %s %s %s %s &",QOSOVERLLDP_FOLDER_NAME,QOSOVERLLDP_SH_NAME,chassisid,portid,
+				INTERVAL,BANDWIFTH_FILE,DELAY_FILE,JITTER_FILE,LOSS_FILE,QOSOVERLLDP_SH_NAME,QOSOVERLLDP_FOLDER_NAME);//注意字符串的长度，是不是超了
 		if(system(sh_cmd) == -1){
 			free(sh_cmd);
 			free(process_cmd);
@@ -305,31 +308,30 @@ add_qos_to_lldp(struct ofpbuf* packet){
 	unsigned char* pbw = data + qos_loc;/**获取指向带宽的指针*/
 	int dynamic_len = strlen("%s/s%s-eth%s%s");
 	char* remainbwfile = xm_vsprintf_ex(dynamic_len+folder_len+chassisid_len+portid_len+strlen(BANDWIFTH_FILE),
-			"%s/s%s-eth%s%s",qosoverlldp_folder,chassisid,portid,BANDWIFTH_FILE);//存放剩余带宽文件的路径
+			"%s/s%s-eth%s%s",QOSOVERLLDP_FOLDER_NAME,chassisid,portid,BANDWIFTH_FILE);//存放剩余带宽文件的路径
 	read_set(remainbwfile,pbw,BANDWIDTH_SIZE,'l');
 	/** 第九步:
 	 *         获取时延的值并设置它
 	 */
 	unsigned char* pdelay = data + qos_loc + BANDWIDTH_SIZE;/**BANDWIDTH_SIZE表示带宽占的字节数,获取指向时延的指针*/
 	char* delayfile = xm_vsprintf_ex(dynamic_len+folder_len+chassisid_len+portid_len+strlen(DELAY_FILE),
-			"%s/s%s-eth%s%s",qosoverlldp_folder,chassisid,portid,DELAY_FILE);//存放时延的文件的路径
+			"%s/s%s-eth%s%s",QOSOVERLLDP_FOLDER_NAME,chassisid,portid,DELAY_FILE);//存放时延的文件的路径
 	read_set(delayfile,pdelay,DELAY_SIZE,'l');
 	/** 第十步:
 	 *         获取抖动的值并设置它
 	 */
 	unsigned char* pjitter = data + qos_loc + BANDWIDTH_SIZE+DELAY_SIZE;/**BANDWIDTH_SIZE+DELAY_SIZE表示带宽和时延占的字节数,获取指向抖动的指针*/
 	char* jitterfile = xm_vsprintf_ex(dynamic_len+folder_len+chassisid_len+portid_len+strlen(JITTER_FILE),
-			"%s/s%s-eth%s%s",qosoverlldp_folder,chassisid,portid,JITTER_FILE);//存放抖动文件的路径
+			"%s/s%s-eth%s%s",QOSOVERLLDP_FOLDER_NAME,chassisid,portid,JITTER_FILE);//存放抖动文件的路径
 	read_set(jitterfile,pjitter,JITTER_SIZE,'l');
 	/** 第十一步:
 	 *         获取丢包率的值并设置它
 	 */
 	unsigned char* ploss = data + qos_loc + BANDWIDTH_SIZE+DELAY_SIZE+JITTER_SIZE;/**表示带宽和时延和抖动占的字节数,获取指向丢包率的指针*/
 	char* lossfile = xm_vsprintf_ex(dynamic_len+folder_len+chassisid_len+portid_len+strlen(LOSS_FILE),
-			"%s/s%s-eth%s%s",qosoverlldp_folder,chassisid,portid,LOSS_FILE);//存放丢包率文件的路径
+			"%s/s%s-eth%s%s",QOSOVERLLDP_FOLDER_NAME,chassisid,portid,LOSS_FILE);//存放丢包率文件的路径
 	read_set(lossfile,ploss,LOSS_SIZE,'f');
 	//最后一步
-	free(qosoverlldp_folder);
     free(chassisid);
     free(portid);
 }
